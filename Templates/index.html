@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Print Job</title>
+</head>
+<body>
+    <form action="/send-print-job" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <input type="text" name="queue" placeholder="Printer Queue" required>
+        <input type="text" name="username" placeholder="Username/Email" required>
+        <input type="text" name="statusURL" placeholder="Status URL">
+        <!-- Add other inputs for other fields here -->
+        <input type="number" name="copies" placeholder="Number of Copies" min="1" required>
+        <input type="checkbox" name="duplex" value="true"> Duplex
+        <input type="checkbox" name="color" value="true" checked> Color
+        <!-- ... -->
+        <button type="submit">Send Print Job</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+    function updateJobsTable() {
+        $.get('/get-jobs', function(data) {
+            var tableBody = $('#jobsTable tbody');
+            tableBody.empty();  // Clear the existing entries
+
+            data.forEach(function(job) {
+                var row = '<tr><td>' + job.filename + '</td><td>' + job.username + '</td><td>' + job.status + '</td></tr>';
+                tableBody.append(row);
+            });
+        });
+    }
+
+        $(document).ready(function() {
+        $("form").submit(function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+                
+        $.ajax({
+            url: '/send-print-job',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                console.log(response);
+                if (response.status === "success") {
+                    $("#statusMessage").text("Job sent successfully! Job ID: " + response.data.jobID);
+                } else {
+                    $("#statusMessage").text("Error: " + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                var errorMessage = xhr.status + ': ' + xhr.statusText
+                $("#statusMessage").text('Job Submission Error - ' + errorMessage);
+            }
+        });
+        // Call updateJobsTable immediately on page load to populate with existing jobs
+        updateJobsTable();
+    
+        //Set an interval to keep updating the jobs table every 5 seconds
+        setInterval(updateJobsTable, 5000);
+    });
+});
+
+        </script>
+        
+        <table id="jobsTable">
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be populated here -->
+            </tbody>
+        </table>
+        
+
+
+</body>
+</html>
