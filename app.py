@@ -3,6 +3,7 @@ from functools import wraps
 from base64 import b64decode
 from logging.config import dictConfig
 from collections import deque
+from datetime import datetime
 import requests
 import uuid
 import urllib3
@@ -67,7 +68,7 @@ API_ENDPOINT = "https://192.168.1.166:31990/v1/print"
 def index():
     return render_template('index.html')
 
-#Send print job API
+#Send print job
 @app.route('/send-print-job', methods=['POST'])
 def send_print_job():
     # Extract data from the form
@@ -82,8 +83,12 @@ def send_print_job():
     paperSource = request.form.get('paperSource')
     statusURL = request.form.get('statusURL')
 
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # This will give a timestamp in 'YYYY-MM-DD HH:MM:SS' format
+
     new_job = {
     'jobID': jobID,
+    'timestamp': timestamp,
+    'printer': queue,
     'filename': file.filename,
     'username': username,
     'status': 'Pending'
@@ -118,7 +123,7 @@ def send_print_job():
         return jsonify({"status": "error", "message": "Unexpected response: " + response.text}), response.status_code
 
 @app.route('/print-job-status', methods=['POST'])
-@requires_auth
+@requires_auth #require auth for status replies. Username/pass must be set and matching in PL
 def print_job_status():
     # Extract data from the request
     data = request.json

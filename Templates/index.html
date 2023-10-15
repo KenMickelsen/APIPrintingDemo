@@ -20,13 +20,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+        //Call get-jobs endpoint to return list of jobs from JSON
     function updateJobsTable() {
         $.get('/get-jobs', function(data) {
             var tableBody = $('#jobsTable tbody');
             tableBody.empty();  // Clear the existing entries
 
             data.forEach(function(job) {
-                var row = '<tr><td>' + job.filename + '</td><td>' + job.username + '</td><td>' + job.status + '</td></tr>';
+                var row = '<tr><td>' + job.timestamp + '</td><td>' + job.printer + '</td><td>' + job.filename + '</td><td>' + job.username + '</td><td>' + job.status + '</td></tr>';
                 tableBody.append(row);
             });
         });
@@ -70,6 +71,8 @@
         <table id="jobsTable">
             <thead>
                 <tr>
+                    <th>Time</th>
+                    <th>Printer</th>
                     <th>Filename</th>
                     <th>Username</th>
                     <th>Status</th>
