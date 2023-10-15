@@ -145,6 +145,7 @@ def print_job_status():
     # Return a simple acknowledgement response
     return Response("Status received.", status=200)
 
+
 @app.route('/get-jobs', methods=['GET'])
 def get_jobs():
     jobs_list = list(PRINT_JOBS)

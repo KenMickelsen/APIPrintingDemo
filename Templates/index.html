@@ -2,6 +2,34 @@
 <html>
 <head>
     <title>Send Print Job</title>
+    <style>
+        /* Style for the entire table */
+        #jobsTable {
+            border-collapse: collapse; /* Remove spaces between borders */
+            width: 100%; /* Full width */
+            margin-top: 20px; /* Spacing at the top for separation from form */
+        }
+    
+        /* Style for table headers (th elements) */
+        #jobsTable th {
+            background-color: #f2f2f2; /* Light gray background */
+            text-align: left;
+            padding: 8px; /* Padding around text */
+            border: 1px solid #ddd; /* Light gray border */
+        }
+    
+        /* Style for table cells (td elements) */
+        #jobsTable td {
+            padding: 8px; /* Padding around text */
+            border: 1px solid #ddd; /* Light gray border */
+        }
+    
+        /* Hover effect for rows */
+        #jobsTable tr:hover {
+            background-color: #f5f5f5; /* Lighter gray background when hovered */
+        }
+    </style>
+    
 </head>
 <body>
     <form action="/send-print-job" method="post" enctype="multipart/form-data">
@@ -34,6 +62,12 @@
     }
 
         $(document).ready(function() {
+        // Call updateJobsTable immediately on page load to populate with existing jobs
+        updateJobsTable();
+    
+        //Set an interval to keep updating the jobs table every 5 seconds
+        setInterval(updateJobsTable, 5000);
+
         $("form").submit(function(e) {
         e.preventDefault();
         
@@ -58,11 +92,6 @@
                 $("#statusMessage").text('Job Submission Error - ' + errorMessage);
             }
         });
-        // Call updateJobsTable immediately on page load to populate with existing jobs
-        updateJobsTable();
-    
-        //Set an interval to keep updating the jobs table every 5 seconds
-        setInterval(updateJobsTable, 5000);
     });
 });
 
