@@ -1,118 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Send Print Job</title>
-    <style>
-        /* Style for the entire table */
-        #jobsTable {
-            border-collapse: collapse; /* Remove spaces between borders */
-            width: 100%; /* Full width */
-            margin-top: 20px; /* Spacing at the top for separation from form */
-        }
-    
-        /* Style for table headers (th elements) */
-        #jobsTable th {
-            background-color: #f2f2f2; /* Light gray background */
-            text-align: left;
-            padding: 8px; /* Padding around text */
-            border: 1px solid #ddd; /* Light gray border */
-        }
-    
-        /* Style for table cells (td elements) */
-        #jobsTable td {
-            padding: 8px; /* Padding around text */
-            border: 1px solid #ddd; /* Light gray border */
-        }
-    
-        /* Hover effect for rows */
-        #jobsTable tr:hover {
-            background-color: #f5f5f5; /* Lighter gray background when hovered */
-        }
-    </style>
+    <title>Home</title>
     
 </head>
 <body>
-    <form action="/send-print-job" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <input type="text" name="queue" placeholder="Printer Queue" required>
-        <input type="text" name="username" placeholder="Username/Email" required>
-        <input type="text" name="statusURL" placeholder="Status URL">
-        <!-- Add other inputs for other fields here -->
-        <input type="number" name="copies" placeholder="Number of Copies" min="1" required>
-        <input type="checkbox" name="duplex" value="true"> Duplex
-        <input type="checkbox" name="color" value="true" checked> Color
-        <!-- ... -->
-        <button type="submit">Send Print Job</button>
-    </form>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        //Call get-jobs endpoint to return list of jobs from JSON
-    function updateJobsTable() {
-        $.get('/get-jobs', function(data) {
-            var tableBody = $('#jobsTable tbody');
-            tableBody.empty();  // Clear the existing entries
-
-            data.forEach(function(job) {
-                var row = '<tr><td>' + job.timestamp + '</td><td>' + job.printer + '</td><td>' + job.filename + '</td><td>' + job.username + '</td><td>' + job.status + '</td></tr>';
-                tableBody.append(row);
-            });
-        });
-    }
-
-        $(document).ready(function() {
-        // Call updateJobsTable immediately on page load to populate with existing jobs
-        updateJobsTable();
-    
-        //Set an interval to keep updating the jobs table every 5 seconds
-        setInterval(updateJobsTable, 5000);
-
-        $("form").submit(function(e) {
-        e.preventDefault();
-        
-        var formData = new FormData(this);
-                
-        $.ajax({
-            url: '/send-print-job',
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                console.log(response);
-                if (response.status === "success") {
-                    $("#statusMessage").text("Job sent successfully! Job ID: " + response.data.jobID);
-                } else {
-                    $("#statusMessage").text("Error: " + response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                var errorMessage = xhr.status + ': ' + xhr.statusText
-                $("#statusMessage").text('Job Submission Error - ' + errorMessage);
-            }
-        });
-    });
-});
-
-        </script>
-        
-        <table id="jobsTable">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Printer</th>
-                    <th>Filename</th>
-                    <th>Username</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be populated here -->
-            </tbody>
-        </table>
-        
-
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/marketing">Marketing</a> |
+        <a href="/application-portal">Application Portal</a>
+        <a href="/settings">Settings</a>
+    </nav>
 
 </body>
 </html>
