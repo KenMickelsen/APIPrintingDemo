@@ -176,6 +176,12 @@ button:hover {
     gap: 33px;
 }
 
+h1 {
+    font-size: 24px;
+    margin: 20px 0;
+    color: #000; 
+}
+
 table {
     width: 80%; /* adjust as needed */
     border-collapse: collapse;
@@ -209,4 +215,58 @@ table tr:hover {
 
 .printButton:hover {
     background-color: #1f2d56; /* a bit darker shade for hover */
+}
+
+.portal-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.portal-content {
+    display: flex;
+    height: calc(100vh - [Your Nav Bar Height]);
+}
+
+.portal-hero {
+    flex: 1;
+    background-image: url('cityscape.png');
+    background-size: cover;
+    background-position: center;
+    padding: 50px;
+    position: relative;
+    color:white;
+}
+
+.portal-hero h1 {
+    color: white;
+}
+
+/* Dark overlay for hero */
+.portal-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Adjust the last value to change the darkness */
+}
+
+.portal-hero h1,
+.portal-hero h2,
+.portal-hero p,
+.portal-hero ul {
+    position: relative; /* To ensure they are over the dark overlay */
+    /* Style your texts accordingly */
+}
+
+.form-section {
+    flex: 0.5; /* Adjust according to your design preference */
+    background-color: #fff; /* Or another suitable color */
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: 30px;
 }

@@ -80,7 +80,7 @@ def marketing_page():
     return render_template('marketing.html', files=files)
 
 #Portal page for applicants
-@app.route('/application-portal', methods=['GET'])
+@app.route('/applicants', methods=['GET'])
 def application_portal():
     return render_template('application_portal.html')
 
