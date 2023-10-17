@@ -2,34 +2,43 @@
 <html>
 <head>
     <title>Marketing Collateral</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link href='https://fonts.googleapis.com/css?family=Plus Jakarta Sans' rel='stylesheet'>
 </head>
 <body>
 
-    <nav>
-        <a href="/">Home</a> |
-        <a href="/marketing">Marketing</a> |
-        <a href="/application-portal">Application Portal</a>
-        <a href="/settings">Settings</a>
-    </nav>
+    <header>
+        <img src="static/logo.png" alt="Indianapolis Logo">
+        <nav>
+            <a href="/">Home</a>
+            <a href="/marketing">Marketing</a>
+            <a href="#">About</a>
+            <a href="/settings">Settings</a>
+            <a href="/application-portal" class="btn btn-text">Portal</a>
+        </nav>
+    </header>
 
-<table>
-    <thead>
-        <tr>
-            <th>File Name</th>
-            <th>View</th>
-            <th>Print</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for file in files %}
-        <tr>
-            <td>{{ file }}</td>
-            <td><a href="{{ url_for('static', filename=file) }}" target="_blank">View</a></td>
-            <td><button class="printButton" data-file="{{ file }}" data-queue="TestPrinter" data-username="basherman@vasion.com" data-copies="1">Print</button></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="content-wrapper">    
+        <h1> Marketing Collateral</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>View</th>
+                    <th>Print</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <tr>
+                    <td>{{ file }}</td>
+                    <td><a href="{{ url_for('static', filename=file) }}" target="_blank">View</a></td>
+                    <td><button class="printButton" data-file="{{ file }}" data-queue="TestPrinter" data-username="basherman@vasion.com" data-copies="1">Print</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="static/printJobs.js"></script> 
