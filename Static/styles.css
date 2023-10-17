@@ -39,7 +39,6 @@ nav a {
     margin-right: 49px;
     margin-left: 49px;
     text-decoration: none;
-    color: #26356B; 
     transition: color 0.2s;
     background: rgba(255, 255, 255, 0.00);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -113,6 +112,11 @@ h1 {
     letter-spacing: -0.32px;
 }
 
+.hero a:hover {
+    color: #777; /* Change to desired hover color */
+    border-bottom: 1px solid #26356B;
+}
+
 button {
     display: flex;
     width: 150px;
@@ -136,6 +140,7 @@ button {
     font-weight: 600;
     line-height: 150%; /* 24px */
     letter-spacing: -0.32px;
+
 }
 
 button:hover {
@@ -157,15 +162,12 @@ button:hover {
     background: #26356B;
     color: #FFF;
     text-align: center;
-    
+    text-decoration: none;
     /* Semibold/Type@16 */
-    font-family: Plus Jakarta Sans;
-    font-size: 16px;
     font-style: normal;
     font-weight: 600;
     line-height: 150%; /* 24px */
     letter-spacing: -0.42px;
-
 }
 
 .content-wrapper {

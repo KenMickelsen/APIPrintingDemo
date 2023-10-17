@@ -79,6 +79,13 @@ def marketing_page():
     files = get_static_files()
     return render_template('marketing.html', files=files)
 
+#marketing page to list files for printing
+@app.route('/applicantlist', methods=['GET'])
+def applicantlist():
+    #Get files in static folder for printing
+    files = get_static_files()
+    return render_template('applicantlist.html', files=files)
+
 #Portal page for applicants
 @app.route('/applicants', methods=['GET'])
 def application_portal():
