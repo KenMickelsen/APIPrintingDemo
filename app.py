@@ -1,14 +1,24 @@
 from flask import Flask, render_template, request, jsonify, Response, send_from_directory
+from flask_cors import CORS
 from functools import wraps
-from base64 import b64decode
 from logging.config import dictConfig
 from collections import deque
 from datetime import datetime
-import requests
-import uuid
-import urllib3
-import json
-import os
+import requests, uuid, urllib3, json, os, socket
+
+#Get local IP address
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Doesn't need to be reachable, the OS just uses this to determine the most
+        # appropriate network interface to use.
+        s.connect(('10.254.254.254', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 #Get files from static folder to be available for printing
 def get_static_files():
@@ -17,12 +27,12 @@ def get_static_files():
     return [f for f in os.listdir(static_dir) if os.path.splitext(f)[1] in valid_extensions]
 
 def save_jobs_to_file(jobs):
-    with open('jobs.json', 'w') as f:
+    with open('static/jobs.json', 'w') as f:
         json.dump(jobs, f)
 
 def load_jobs_from_file():
     try:
-        with open('jobs.json', 'r') as f:
+        with open('static/jobs.json', 'r') as f:
             jobs_list = json.load(f)
             return deque(jobs_list, maxlen=20)  # Convert the loaded list into a deque with a max length of 20
     except (FileNotFoundError, json.JSONDecodeError):
@@ -50,6 +60,7 @@ dictConfig({
 })
 
 app = Flask(__name__)
+CORS(app)
 
 # Basic Auth functions
 def requires_auth(f):
@@ -67,6 +78,21 @@ def check_auth(username, password):
     return username == 'admin' and password == 'secret'
 
 API_ENDPOINT = "https://192.168.1.166:31990/v1/print"
+
+#Load list of program participants from programParticipants.json 
+@app.route('/get-applicants', methods=['GET'])
+def get_applicants():
+    with open('static/programParticipants.json', 'r') as file:
+        data = json.load(file)
+    return jsonify(data)
+
+#Save edited data from program participants to programParticipants.json
+@app.route('/save-applicants', methods=['POST'])
+def save_applicants():
+    data = request.get_json()  # Use get_json() to parse incoming JSON data
+    with open('static/programParticipants.json', 'w') as file:
+        json.dump(data, file)
+    return jsonify({"status": "success"})
 
 @app.route('/', methods=['GET'])
 def index():
@@ -194,4 +220,4 @@ def get_jobs():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host=get_local_ip(), port=5000, debug=True)

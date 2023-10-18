@@ -33,6 +33,7 @@ header img {
 nav {
     display: flex;
     align-items: center;
+    padding-right: 20px;
 }
 
 nav a {
@@ -136,19 +137,21 @@ button:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 33px;
-}
-
-h1 {
-    font-size: 24px;
-    margin: 20px 0;
-    color: #000; 
+    gap: 10px;
 }
 
 table {
-    width: 80%; /* adjust as needed */
+    width: 70%; /* adjust as needed */
     border-collapse: collapse;
     margin-top: 20px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;  /* Adjust as needed to space it from the table */
 }
 
 table th, table td {
@@ -166,6 +169,25 @@ table tr:hover {
     background-color: #f5f5f5; /* hover effect */
 }
 
+tbody tr:hover {
+    background-color: #f3f3f3;  /* Light grey */
+}
+
+.table-buttons {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    margin-bottom: 5px; /* Space between the buttons and the table */
+    justify-content: flex-end; /* Align the buttons to the right */
+
+    margin-left: auto; /* Align the div to the center */
+    margin-right: auto; /* Align the div to the center */
+}
+
+
+.selectRow {
+    margin-right: 10px;
+}
+
 .printButton {
     background-color: #26356B;
     color: white;
@@ -180,50 +202,6 @@ table tr:hover {
     background-color: #1f2d56; /* a bit darker shade for hover */
 }
 
-.portal-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
-.portal-content {
-    display: flex;
-    height: calc(100vh - [Your Nav Bar Height]);
-}
-
-.portal-hero {
-    flex: 1;
-    background-image: url('cityscape.png');
-    background-size: cover;
-    background-position: center;
-    padding: 50px;
-    position: relative;
-    color:white;
-}
-
-.portal-hero h1 {
-    color: white;
-}
-
-/* Dark overlay for hero */
-.portal-hero::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.6); /* Adjust the last value to change the darkness */
-}
-
-.portal-hero h1,
-.portal-hero h2,
-.portal-hero p,
-.portal-hero ul {
-    position: relative; /* To ensure they are over the dark overlay */
-    /* Style your texts accordingly */
-}
-
 .form-section {
     flex: 0.5; /* Adjust according to your design preference */
     background-color: #fff; /* Or another suitable color */
@@ -232,4 +210,40 @@ table tr:hover {
 
 .form-group {
     margin-bottom: 30px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    color:#000;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover, .close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Applicant List</title>
+    <title>Program Participants</title>
     <link rel="stylesheet" href="static/styles.css">
     <link href='https://fonts.googleapis.com/css?family=Plus Jakarta Sans' rel='stylesheet'>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="static/printJobs.js"></script> 
 </head>
 <body>
 
@@ -12,37 +14,189 @@
         <nav>
             <a href="/">Home</a>
             <a href="/marketing">Marketing</a>
-            <a href="/applicantlist">Applicants List</a>
+            <a href="/applicantlist">Program Participants</a>
             <a href="/settings">Settings</a>
             <a href="/application-portal" class="btn btn-text">City Login</a>
         </nav>
     </header>
 
-    <div class="content-wrapper">    
-            <h1> Applicant List</h1>
+    <div class="content-wrapper">      
+        <div class="table">
+            <div class="table-header">
+                <h1> Program Participants</h1>
+                
+                <div class="table-buttons">
+                    <button id="addRow" class="btn btn-text">Add Row</button>
+                    <button id="deleteRows" class="btn btn-text">Delete Row(s)</button>
+                    <button id="printButton" class="btn btn-text">Print</button>
+                </div>
+            </div>
+        
             <table>
                 <thead>
                     <tr>
-                        <th>Applicant Name</th>
+                        <th>Select</th>
+                        <th>Participant Name</th>
                         <th>Email</th>
                         <th>Landlord Name</th>
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for file in files %}
-                    <tr>
-                        <td>{{ file }}</td>
-                        <td><a href="{{ url_for('static', filename=file) }}" target="_blank">View</a></td>
-                        <td><button class="printButton" data-file="{{ file }}" data-queue="TestPrinter" data-username="basherman@vasion.com" data-copies="1">Print</button></td>
-                    </tr>
-                    {% endfor %}
+                <tbody id="applicantsTable">
+                    <!-- Data will be loaded via JavaScript -->
                 </tbody>
             </table>
+        </div>
     </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="static/printJobs.js"></script> 
+    <div id="printModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Print Options</h2>
+            <div id="selectedNames">
+               <!-- Selected participant names will be listed here -->
+            </div>
+            <label for="printerDropdown">Select Printer:</label>
+            <select id="printerDropdown">
+                <!-- Options of available printers will go here -->
+            </select>
+    
+            <label for="copyCount">Number of Copies:</label>
+            <input type="number" id="copyCount" min="1" value="1">
+    
+            <label>
+                <input type="checkbox" id="duplexCheckbox"> Duplex
+            </label>
+    
+            <label>
+                <input type="checkbox" id="colorCheckbox"> Color
+            </label>
+    
+            <button class="btn btn-text">Confirm & Print</button>
+        </div>
+    </div>    
 
+    <script>
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        const debouncedSave = debounce(saveTableData, 500);
+        
+        $(document).ready(function() {
+            // Fetch and display data
+            $.get('/get-applicants', function(data) {
+                data.forEach(function(applicant) {
+                    addRow(applicant);
+                });
+            });
+
+            // for autosave right after fetching and displaying data
+            $("#applicantsTable").on('input', '[contenteditable="true"]', function() {
+                debouncedSave();
+            });
+
+            let printButton = $("#printButton");
+            let printModal = $("#printModal");
+            let closeModal = $(".close-btn");
+            
+            printButton.click(function() {
+                let selectedNames = $('#applicantsTable tr').find('input[type="checkbox"]:checked').closest('tr').find(".name");
+
+                // List names in the modal:
+                let namesList = "";
+                selectedNames.each(function() {
+                    namesList += "<p>" + $(this).text() + "</p>";
+                });
+
+                $("#selectedNames").html(namesList);
+
+                printModal.css("display", "block");
+            });
+            
+            closeModal.click(function() {
+                printModal.css("display", "none");
+            });
+            
+            $(window).click(function(event) {
+                if ($(event.target).is(printModal)) {
+                    printModal.css("display", "none");
+                }
+            });
+
+            // Add new row
+            $('#addRow').click(function() {
+                addRow();
+            });
+        });
+
+        // Delete selected rows
+        $('#deleteRows').click(function() {
+                let selectedRows = $('#applicantsTable tr').find('input[type="checkbox"]:checked').closest('tr');
+
+                if (selectedRows.length === 0) {
+                    alert("Please select rows to delete.");
+                    return;
+                }
+
+                let confirmation = confirm("Are you sure you want to delete the selected rows?");
+
+                if (confirmation) {
+                    selectedRows.remove();
+                    saveTableData();
+                }
+            });
+
+        function addRow(applicant = {}) {
+            let row = `
+                <tr>
+                    <td><input type="checkbox" class="selectRow"></td>
+                    <td contenteditable="true" class="name">${applicant.name || ""}</td>
+                    <td contenteditable="true" class="email">${applicant.email || ""}</td>
+                    <td contenteditable="true" class="landlord">${applicant.landlord || ""}</td>
+                    <td contenteditable="true" class="status">${applicant.status || ""}</td>
+                </tr>
+            `;
+
+            $('#applicantsTable').append(row);
+        }
+
+        function saveTableData() {
+            let data = [];
+            $("#applicantsTable tr").each(function() {
+                let name = $(this).find(".name").text();
+                let email = $(this).find(".email").text();
+                let landlord = $(this).find(".landlord").text();
+                let status = $(this).find(".status").text();
+                
+                data.push({
+                    name: name,
+                    email: email,
+                    landlord: landlord,
+                    status: status
+                });
+            });
+
+            $.post({
+                url: '/save-applicants',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === "success") {
+                        console.log("Data saved successfully!");
+                    } else {
+                        console.log("Failed to save data!");
+                    }
+                }
+            });
+        }
+
+    </script>
 </body>
 </html>
