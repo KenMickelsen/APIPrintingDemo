@@ -77,7 +77,7 @@ def check_auth(username, password):
     # OM Username/pass field for status updates
     return username == 'admin' and password == 'secret'
 
-API_ENDPOINT = "https://192.168.1.166:31990/v1/print"
+API_ENDPOINT = "https://VasionEBC-SC:31990/v1/print"
 
 #Load list of program participants from programParticipants.json 
 @app.route('/get-applicants', methods=['GET'])

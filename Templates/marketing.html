@@ -10,7 +10,8 @@
 
     <header>
         <img src="static/logo.png" alt="Indianapolis Logo">
-        <nav>
+        <button class="menu-btn">&#9776;</button> <!-- Hamburger Icon -->
+        <nav class="nav-links">
             <a href="/">Home</a>
             <a href="/marketing">Marketing</a>
             <a href="/applicantlist">Program Participants</a>
@@ -24,8 +25,7 @@
             <div class="table-header">
                 <h1> Campaign Collateral</h1>
                 <div class="table-buttons">
-                    <button id="addRow" class="btn btn-text">Add Row</button>
-                    <button id="deleteRows" class="btn btn-text">Delete Row(s)</button>
+                    <button id="uploadPDF" class="btn btn-text">Upload PDF or Image</button>
                     <button id="printButton" class="btn btn-text">Print</button>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                     <tr>
                         <td>{{ file }}</td>
                         <td><a href="{{ url_for('static', filename=file) }}" target="_blank">View</a></td>
-                        <td><button class="printButton" data-file="{{ file }}" data-queue="TestPrinter" data-username="basherman@vasion.com" data-copies="1">Print</button></td>
+                        <td><button class="printButton" data-file="{{ file }}" data-queue="OMHPServiceClient" data-username="basherman@vasion.com" data-copies="1">Print</button></td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -56,4 +56,14 @@ $(document).ready(function() {
             $("#statusMessage").text(response.status === "success" ? "Job sent successfully! Job ID: " + response.data.jobID : "Error: " + response.message);
         });
     });
+
+    document.querySelector(".menu-btn").addEventListener("click", function() {
+        const navLinks = document.querySelector(".nav-links");
+        if (navLinks.style.display === "none" || navLinks.style.display === "") {
+            navLinks.style.display = "flex";
+        } else {
+            navLinks.style.display = "none";
+        }
+    });
+    
 });

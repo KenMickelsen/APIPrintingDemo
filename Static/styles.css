@@ -11,7 +11,7 @@ body {
 }
 
 body.home-page {
-    background-image: url('siteimage.png');
+    background-image: url('siteimagemobile.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -44,7 +44,7 @@ nav a {
     transition: color 0.2s;
     background: rgba(255, 255, 255, 0.00);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 10px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 500;
     line-height: 150%; /* 24px */
@@ -84,7 +84,7 @@ h1 {
     flex-shrink: 0;
     color: #FFF;
     text-align: center;
-    font-size: 45px;
+    font-size: 35px;
     font-style: normal;
     font-weight: 500;
     line-height: 121.2%; /* 25.452px */
@@ -94,7 +94,7 @@ h1 {
     color: #FFF;
     text-align: center;
     text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    font-size: 84px;
+    font-size: 50px;
     font-weight: 800;
     line-height: 121.2%; /* 101.808px */
     text-transform: uppercase;
@@ -144,6 +144,10 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+}
+
+.table-scroll {
+    overflow-x: auto; /* Enable horizontal scrolling */
 }
 
 .table-header {
@@ -282,6 +286,33 @@ img {
     max-width: 100%;
     height: auto;
 }
+
+.menu-btn {
+    display: block;
+    cursor: pointer;
+    font-size: 24px;
+    margin-right: 16px;
+    background: none;
+    border: none;
+    color: #26356B;
+}
+
+.nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 1);
+    position: absolute;
+    top: 60px; /* Adjust based on your header height */
+    left: 0;
+    z-index: 10; /* Make sure the menu appears on top */
+}
+
+.nav-links a {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+}
 /* Styles for tablets and above */
 @media (min-width: 768px) {
     header {
@@ -320,12 +351,38 @@ img {
         color: #26356B; 
     }
 
+    .hero h1 {
+        font-size: 55px;
+    }
+
+    .hero h2 {
+        font-size: 84px;
+    }
+
     .content-wrapper {
         display: flex;
     }
 
     .table-header {
         display: flex;
+    }
+
+    .menu-btn {
+        display: none;
+    }
+
+    .nav-links {
+        display: flex;
+        flex-direction: row;
+        background: none;
+        position: static;
+    }
+
+    body.home-page {
+        background-image: url('siteimage.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 }
 
