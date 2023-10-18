@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify, Response, send_from_directory
-from flask_cors import CORS
+from flask import Flask, render_template, request, jsonify, Response, send_from_directory, redirect, url_for
 from functools import wraps
 from logging.config import dictConfig
 from collections import deque
 from datetime import datetime
-import requests, uuid, urllib3, json, os, socket
+import requests, uuid, urllib3, json, os, socket, logging
+
+logging.basicConfig(filename='app.log', level=logging.DEBUG)
 
 #Get local IP address
 def get_local_ip():
@@ -54,13 +55,12 @@ dictConfig({
         'formatter': 'default'
     }},
     'root': {
-        'level': 'INFO',
+        'level': 'DEBUG',
         'handlers': ['wsgi']
     }
 })
 
 app = Flask(__name__)
-CORS(app)
 
 # Basic Auth functions
 def requires_auth(f):
@@ -94,10 +94,18 @@ def save_applicants():
         json.dump(data, file)
     return jsonify({"status": "success"})
 
-@app.route('/save-printers', methods=['POST'])
+#Load list of printers and settings from settings.json 
+@app.route('/get-settings', methods=['GET'])
+def get_settings():
+    with open('static/settings.json', 'r') as file:
+        data = json.load(file)
+    return jsonify(data)
+
+#Save edited settings to settings.json
+@app.route('/save-settings', methods=['POST'])
 def save_printers():
     data = request.get_json()  # Use get_json() to parse incoming JSON data
-    with open('static/printers.json', 'w') as file:
+    with open('static/settings.json', 'w') as file:
         json.dump(data, file)
     return jsonify({"status": "success"})
 
@@ -129,11 +137,32 @@ def application_portal():
 def settings():
     return render_template('settings.html')
 
+@app.route('/upload-default-job', methods=['POST'])
+def upload_default_job():
+    file = request.files.get('file')
+    if file:
+        # Save the file to a specific location.
+        file.save(os.path.join("static", "check.pdf"))
+    return redirect(url_for('settings'))  # Redirect back to settings page.
+
 #Send print job
 @app.route('/send-print-job', methods=['POST'])
 def send_print_job():
     file = request.files.get('file')
     filename = request.form.get('filename')
+
+    # Get the local IP address
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.254.254.254', 1))
+        local_ip = s.getsockname()[0]
+    except Exception:
+        local_ip = '127.0.0.1'
+    finally:
+        s.close()
+
+    statusURL = f"http://{local_ip}:5000/print-job-status"
 
     # If a filename is provided, it's a prestored file, so set the file path accordingly
     if filename:
@@ -188,9 +217,13 @@ def send_print_job():
     files = {
         'file': file_content
     }
-    
+
     response = requests.post(API_ENDPOINT, data=data, files=files, verify=False)  # verify=False is to bypass SSL verification if your local server has a self-signed cert
     print("API Response:", response.text)
+    
+    logging.debug('Data being sent: %s', data)
+    logging.debug('Files being sent: %s', files)
+    logging.debug('API Response: %s', response.text)
 
     if response.headers.get('Content-Type') and 'application/json' in response.headers.get('Content-Type'):
         return jsonify({"status": "success", "data": response.json()})

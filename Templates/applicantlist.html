@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Program Participants</title>
     <link rel="stylesheet" href="static/styles.css">
     <link href='https://fonts.googleapis.com/css?family=Plus Jakarta Sans' rel='stylesheet'>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="static/printJobs.js"></script> 
 </head>
-<body>
 
+<body>
     <header>
         <img src="static/logo.png" alt="Indianapolis Logo">
         <nav>
@@ -53,9 +54,19 @@
         <div class="modal-content">
             <span class="close-btn">&times;</span>
             <h2>Print Options</h2>
-            <div id="selectedNames">
-               <!-- Selected participant names will be listed here -->
+            <div id="selected-Names">
+                <table class="selected-names-table">
+                    <thead>
+                        <tr>
+                            <th>Approved Participants</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Selected participant names will be listed here in <tr> rows -->
+                    </tbody>
+                </table>
             </div>
+            
             <label for="printerDropdown">Select Printer:</label>
             <select id="printerDropdown">
                 <!-- Options of available printers will go here -->
@@ -91,10 +102,25 @@
         $(document).ready(function() {
             // Fetch and display data
             $.get('/get-applicants', function(data) {
-                data.forEach(function(applicant) {
+                console.log("Fetched data:", data);
+                Object.values(data).forEach(function(applicant) {
                     addRow(applicant);
                 });
             });
+
+
+            $(document).ready(function() {
+                // Fetch available printers and populate the dropdown
+                $.get('/get-settings', function(data) {
+                    let printerDropdown = $('#printerDropdown');
+                    data.printers.forEach(function(printer) {
+                        let option = $('<option></option>').val(printer).text(printer);
+                        printerDropdown.append(option);
+                    });
+                });
+            });
+
+            $("#printModal .btn.btn-text").click(confirmAndPrint);
 
             // for autosave right after fetching and displaying data
             $("#applicantsTable").on('input', '[contenteditable="true"]', function() {
@@ -105,16 +131,19 @@
             let printModal = $("#printModal");
             let closeModal = $(".close-btn");
             
+
             printButton.click(function() {
                 let selectedNames = $('#applicantsTable tr').find('input[type="checkbox"]:checked').closest('tr').find(".name");
 
                 // List names in the modal:
                 let namesList = "";
                 selectedNames.each(function() {
-                    namesList += "<p>" + $(this).text() + "</p>";
+                    namesList += "<tr><td>" + $(this).text() + "</td></tr>";
+                    console.log(namesList);
                 });
 
-                $("#selectedNames").html(namesList);
+                // Append the table rows to the tbody of the table in the modal:
+                 $("#selected-Names .selected-names-table tbody").html(namesList);
 
                 printModal.css("display", "block");
             });
@@ -165,6 +194,40 @@
 
             $('#applicantsTable').append(row);
         }
+        
+        function confirmAndPrint() {
+            let filename = "Check.pdf";
+            let copies = $("#copyCount").val();
+            let duplex = $('#duplexCheckbox').is(":checked");
+            let color = $('#colorCheckbox').is(":checked");
+
+            let data = new FormData();
+            // Fetch the actual file content based on the hardcoded filename path
+            
+            fetch(`static/${filename}`)
+                .then(response => response.blob())
+                .then(blob => {
+                    data.append('file', blob, filename);
+                    data.append('queue', $('#printerDropdown').val());
+                    data.append('username', "basherman@vasion.com");  // Fetch from your UI or remove if not necessary
+                    data.append('copies', copies);
+                    data.append('duplex', duplex);
+                    data.append('color', color);
+
+                    return $.ajax({
+                        url: '/send-print-job',
+                        type: 'POST',
+                        data: data,
+                        processData: false,
+                        contentType: false
+                    });
+                })
+                .then(response => {
+                    alert(response.status === "success" ? "Job sent successfully!" : "Error: " + response.message);
+                });
+}
+
+
 
         function saveTableData() {
             let data = [];

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketing Collateral</title>
     <link rel="stylesheet" href="static/styles.css">
     <link href='https://fonts.googleapis.com/css?family=Plus Jakarta Sans' rel='stylesheet'>
@@ -19,7 +20,16 @@
     </header>
 
     <div class="content-wrapper">    
-            <h1> Campaign Collateral</h1>
+        <div class="table">
+            <div class="table-header">
+                <h1> Campaign Collateral</h1>
+                <div class="table-buttons">
+                    <button id="addRow" class="btn btn-text">Add Row</button>
+                    <button id="deleteRows" class="btn btn-text">Delete Row(s)</button>
+                    <button id="printButton" class="btn btn-text">Print</button>
+                </div>
+            </div>
+
             <table>
                 <thead>
                     <tr>
@@ -38,6 +48,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
     </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

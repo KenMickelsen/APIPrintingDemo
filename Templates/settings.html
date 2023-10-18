@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
     <link rel="stylesheet" href="static/styles.css">
     <link href='https://fonts.googleapis.com/css?family=Plus Jakarta Sans' rel='stylesheet'>
@@ -54,8 +55,14 @@
         <input type="checkbox" name="color" value="true" checked> Color
         <!-- ... -->
         <button type="submit">Send Print Job</button>
-    </form>
-    
+    </form>  
+
+    <form action="/upload-default-job" method="post" enctype="multipart/form-data">
+        <label for="defaultFile">Default Check Print Job:</label>
+        <input type="file" name="file" id="defaultFile" required>
+        <button type="submit">Upload and Save</button>
+    </form>    
+
     <div class="content-wrapper">      
         <div class="table">
             <div class="table-header">
@@ -96,6 +103,21 @@
         
         $(document).ready(function() {
 
+            // Fetch and display data
+            $.get('/get-settings', function(data) {
+                data.printers.forEach(function(printer) {
+                    addRow(printer);
+                });
+            });
+
+            function addRow(printerName) {
+            let newRow = `
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td><input type="text" name="printer_name" value="${printerName}" placeholder="Enter Printer Name"></td>
+                </tr>`;
+            printersTable.append(newRow);
+            }
             let reportsButton = $("#reportsButton");
             let jobsModal = $("#jobsModal");
             let closeJobsModal = jobsModal.find(".close-btn");
@@ -151,45 +173,44 @@
                 let isChecked = $(this).is(":checked");
                 printersTable.find("input[type='checkbox']").prop("checked", isChecked);
             });
-    });
+        });
 
-    function savePrinterTableData() {
-    // Gather all printer names into an array
-    let printerNames = [];
-    
-    // Iterate through each printer name input field and get its value
-    $('#printersTable tbody input[name="printer_name"]').each(function() {
-        let printerName = $(this).val();
-        if (printerName) { // Ensure the printer name is not an empty string
-            printerNames.push(printerName);
-        }
-    });
-
-    // Create a data object to match expected structure on the server
-    let dataToSend = {
-        printers: printerNames
-    };
-
-    // Use jQuery's ajax method to send data
-    $.ajax({
-        url: '/save-printers',
-        type: 'POST',
-        data: JSON.stringify(dataToSend),
-        contentType: 'application/json',
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === "success") {
-                console.log("Data saved successfully!");
-            } else {
-                console.log("Failed to save data!");
+        function savePrinterTableData() {
+        // Gather all printer names into an array
+        let printerNames = [];
+        
+        // Iterate through each printer name input field and get its value
+        $('#printersTable tbody input[name="printer_name"]').each(function() {
+            let printerName = $(this).val();
+            if (printerName) { // Ensure the printer name is not an empty string
+                printerNames.push(printerName);
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error("Error:", errorThrown);
-        }
-    });
-}
+        });
 
+        // Create a data object to match expected structure on the server
+        let dataToSend = {
+            printers: printerNames
+        };
+
+        // Use jQuery's ajax method to send data
+        $.ajax({
+            url: '/save-settings',
+            type: 'POST',
+            data: JSON.stringify(dataToSend),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === "success") {
+                    console.log("Data saved successfully!");
+                } else {
+                    console.log("Failed to save data!");
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error:", errorThrown);
+            }
+        });
+        }
     </script>
 </body>
 </html>
