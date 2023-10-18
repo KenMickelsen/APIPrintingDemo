@@ -94,6 +94,13 @@ def save_applicants():
         json.dump(data, file)
     return jsonify({"status": "success"})
 
+@app.route('/save-printers', methods=['POST'])
+def save_printers():
+    data = request.get_json()  # Use get_json() to parse incoming JSON data
+    with open('static/printers.json', 'w') as file:
+        json.dump(data, file)
+    return jsonify({"status": "success"})
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')

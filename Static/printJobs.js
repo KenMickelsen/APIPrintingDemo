@@ -31,8 +31,6 @@ function updateJobsTable() {
     });
 }
 
-
-
 $(document).ready(function() {
     if ($('#jobsTable').length) {
         updateJobsTable();

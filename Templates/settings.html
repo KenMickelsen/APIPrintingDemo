@@ -17,6 +17,32 @@
             <a href="/application-portal" class="btn btn-text">City Login</a>
     </nav>
 
+    <!-- The button to trigger the modal -->
+    <button id="reportsButton" class="btn btn-text">Reports</button>
+
+    <!-- The modal structure -->
+    <div id="jobsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Print Job Reports</h2>
+            <table id="jobsTable">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Printer</th>
+                        <th>Filename</th>
+                        <th>Username</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
     <form action="/send-print-job" method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <input type="text" name="queue" placeholder="Printer Queue" required>
@@ -29,19 +55,141 @@
         <!-- ... -->
         <button type="submit">Send Print Job</button>
     </form>
-        <table id="jobsTable">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Printer</th>
-                    <th>Filename</th>
-                    <th>Username</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be populated here -->
-            </tbody>
-        </table>
+    
+    <div class="content-wrapper">      
+        <div class="table">
+            <div class="table-header">
+                <h1> Printers</h1>
+                
+                <div class="table-buttons">
+                    <button id="addRow" class="btn btn-text">Add Row</button>
+                    <button id="deleteRows" class="btn btn-text">Delete Row(s)</button>
+                </div>
+            </div>
+        
+            <table id="printersTable" class="table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
+                        <th>Printer Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script>
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        const debouncedSave = debounce(savePrinterTableData, 500);
+        
+        $(document).ready(function() {
+
+            let reportsButton = $("#reportsButton");
+            let jobsModal = $("#jobsModal");
+            let closeJobsModal = jobsModal.find(".close-btn");
+            let printersTable = $("#printersTable tbody");
+            let addRowButton = $("#addRow");
+            let deleteRowsButton = $("#deleteRows");
+            let selectAllCheckbox = $("#selectAll");
+
+
+            // Detect when user is typing into any printer name input field
+            printersTable.on('input', 'input[name="printer_name"]', function() {
+                debouncedSave();
+                });
+
+            reportsButton.click(function() {
+                jobsModal.css("display", "block");
+            });
+
+            closeJobsModal.click(function() {
+                jobsModal.css("display", "none");
+            });
+
+            // Close the modal when clicking outside of it
+            $(window).click(function(event) {
+                if ($(event.target).is(jobsModal)) {
+                    jobsModal.css("display", "none");
+                }
+            });
+
+            // Add Row functionality
+            addRowButton.click(function() {
+                let newRow = `
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><input type="text" name="printer_name" placeholder="Enter Printer Name"></td>
+                    </tr>`;
+                printersTable.append(newRow);
+            });
+
+            // Delete Rows functionality
+            deleteRowsButton.click(function() {
+                // Here, we assume each row has a checkbox and we're checking if it's checked
+                // Let's add a checkbox to the row to support this functionality
+                printersTable.find("tr").each(function() {
+                    let row = $(this);
+                    if (row.find("input[type='checkbox']").is(":checked")) {
+                        row.remove();
+                    }
+                });
+            });
+
+            selectAllCheckbox.click(function() {
+                let isChecked = $(this).is(":checked");
+                printersTable.find("input[type='checkbox']").prop("checked", isChecked);
+            });
+    });
+
+    function savePrinterTableData() {
+    // Gather all printer names into an array
+    let printerNames = [];
+    
+    // Iterate through each printer name input field and get its value
+    $('#printersTable tbody input[name="printer_name"]').each(function() {
+        let printerName = $(this).val();
+        if (printerName) { // Ensure the printer name is not an empty string
+            printerNames.push(printerName);
+        }
+    });
+
+    // Create a data object to match expected structure on the server
+    let dataToSend = {
+        printers: printerNames
+    };
+
+    // Use jQuery's ajax method to send data
+    $.ajax({
+        url: '/save-printers',
+        type: 'POST',
+        data: JSON.stringify(dataToSend),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === "success") {
+                console.log("Data saved successfully!");
+            } else {
+                console.log("Failed to save data!");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("Error:", errorThrown);
+        }
+    });
+}
+
+    </script>
 </body>
 </html>
