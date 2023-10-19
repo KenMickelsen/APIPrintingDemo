@@ -1,1 +1,1 @@
-{"printers": ["OMHPServiceClient", "OMLexmarkServiceClient", "OMXeroxServiceClient", "TestPrinter", "TestPrinter"], "apiEndpoint": "https://vasionEBC-SC:31990/v1/print"}
+{"printers": ["OMHPServiceClient", "OMLexmarkServiceClient", "OMXeroxServiceClient"], "apiEndpoint": "https://vasionEBC-SC:31990/v1/print"}
