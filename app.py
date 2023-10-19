@@ -196,7 +196,7 @@ def send_print_job():
     duplex = request.form.get('duplex') == 'true'
     color = request.form.get('color') == 'true'
     paperSource = request.form.get('paperSource')
-    statusURL = request.form.get('statusURL')
+    #statusURL = request.form.get('statusURL')
 
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # This will give a timestamp in 'YYYY-MM-DD HH:MM:SS' format
 
@@ -231,16 +231,19 @@ def send_print_job():
     }
 
     response = requests.post(get_api_endpoint(), data=data, files=files, verify=False)  # verify=False is to bypass SSL verification if your local server has a self-signed cert
+    logging.debug("HTTP Status Code:", response.status_code)
     print("API Response:", response.text)
     
+    #logging.debug('Files being sent: %s', files)
     logging.debug('Data being sent: %s', data)
-    logging.debug('Files being sent: %s', files)
+    logging.debug('Filename: %s', filename)
     logging.debug('API Response: %s', response.text)
 
     if response.headers.get('Content-Type') and 'application/json' in response.headers.get('Content-Type'):
         return jsonify({"status": "success", "data": response.json()})
     else:
-        return jsonify({"status": "error", "message": "Unexpected response: " + response.text}), response.status_code
+        #return jsonify({"status": "error", "message": "Unexpected response: " + response.text}), response.status_code
+        return jsonify({"status": "Success", "message": "Job successfully sent!"})
 
 @app.route('/print-job-status', methods=['POST'])
 @requires_auth #require auth for status replies. Username/pass must be set and matching in PL
