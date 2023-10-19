@@ -227,7 +227,7 @@ def send_print_job():
     }
    
     files = {
-        'file': file_content
+        'file': (filename, file_content)
     }
 
     response = requests.post(get_api_endpoint(), data=data, files=files, verify=False)  # verify=False is to bypass SSL verification if your local server has a self-signed cert
