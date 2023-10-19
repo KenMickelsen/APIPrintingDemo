@@ -373,6 +373,10 @@ img {
         display: flex;
     }
 
+    .table-buttons {
+        margin-right: 33px; /* Align the div to the center */
+    }
+
     .menu-btn {
         display: none;
     }
