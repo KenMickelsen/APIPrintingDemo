@@ -76,6 +76,10 @@ h1 {
     padding: 20px;
 }
 
+h2 {
+    color:#000;
+}
+
 .hero h1 {
     display: flex;
     height: 14px;
@@ -147,7 +151,8 @@ table {
 }
 
 .table-scroll {
-    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    width: 100%;
 }
 
 .table-header {
@@ -274,6 +279,7 @@ tbody tr:hover {
 label {
     padding: 10px;
     gap: 10px;
+    color:#000;
 }
 
 .container {

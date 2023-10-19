@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, Response, send_from_directory, redirect, url_for
+from flask import Flask, render_template, request, jsonify, Response, current_app, redirect, url_for
 from functools import wraps
 from logging.config import dictConfig
 from collections import deque
@@ -38,6 +38,18 @@ def load_jobs_from_file():
             return deque(jobs_list, maxlen=20)  # Convert the loaded list into a deque with a max length of 20
     except (FileNotFoundError, json.JSONDecodeError):
         return deque([], maxlen=20)  # Return an empty deque with a maximum length of 20 if the file is not found or is empty.
+    
+def get_api_endpoint():
+    try:
+        with open('static/settings.json', 'r') as file:
+            data = json.load(file)
+            endpoint = data.get('apiEndpoint', "https://VasionEBC-SC:31990/v1/print")  # Default value if not found
+            current_app.logger.info(f"API Endpoint loaded: {endpoint}")
+            return endpoint
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        default_endpoint = "https://VasionEBC-SC:31990/v1/print"
+        current_app.logger.error(f"Error reading API endpoint from settings.json: {e}. Defaulting to: {default_endpoint}")
+        return default_endpoint
 
 #Load print job history from jobs.json
 PRINT_JOBS = load_jobs_from_file()
@@ -218,7 +230,7 @@ def send_print_job():
         'file': file_content
     }
 
-    response = requests.post(API_ENDPOINT, data=data, files=files, verify=False)  # verify=False is to bypass SSL verification if your local server has a self-signed cert
+    response = requests.post(get_api_endpoint(), data=data, files=files, verify=False)  # verify=False is to bypass SSL verification if your local server has a self-signed cert
     print("API Response:", response.text)
     
     logging.debug('Data being sent: %s', data)

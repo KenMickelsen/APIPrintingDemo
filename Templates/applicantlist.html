@@ -18,7 +18,7 @@
             <a href="/marketing">Marketing</a>
             <a href="/applicantlist">Program Participants</a>
             <a href="/settings">Settings</a>
-            <a href="/application-portal" class="btn btn-text">City Login</a>
+            <a href="/" class="btn btn-text">Logout</a>
         </nav>
     </header>
 
@@ -33,7 +33,7 @@
                     <button id="printButton" class="btn btn-text">Print</button>
                 </div>
             </div>
-            <div>
+        <div class="table-scroll">
             <table>
                 <thead>
                     <tr>
@@ -123,6 +123,11 @@
 
             $("#printModal .btn.btn-text").click(confirmAndPrint);
 
+            $('.btn.btn-text').on('click', function() {
+                $('#printModal').hide();
+            });
+
+
             // for autosave right after fetching and displaying data
             $("#applicantsTable").on('input', '[contenteditable="true"]', function() {
                 debouncedSave();
@@ -195,41 +200,39 @@
 
             $('#applicantsTable').append(row);
         }
-        
+
         function confirmAndPrint() {
-            let filename = "Check.pdf";
-            let copies = $("#copyCount").val();
-            let duplex = $('#duplexCheckbox').is(":checked");
-            let color = $('#colorCheckbox').is(":checked");
+        let filename = "Check.pdf";
+        let copies = $("#copyCount").val();
+        let duplex = $('#duplexCheckbox').is(":checked");
+        let color = $('#colorCheckbox').is(":checked");
 
-            let data = new FormData();
-            // Fetch the actual file content based on the hardcoded filename path
-            
-            fetch(`static/${filename}`)
-                .then(response => response.blob())
-                .then(blob => {
-                    data.append('file', blob, filename);
-                    data.append('queue', $('#printerDropdown').val());
-                    data.append('username', "basherman@vasion.com");  // Fetch from your UI or remove if not necessary
-                    data.append('copies', copies);
-                    data.append('duplex', duplex);
-                    data.append('color', color);
+        let data = new FormData();
+        // Fetch the actual file content based on the hardcoded filename path
+        
+        fetch(`static/${filename}`)
+            .then(response => response.blob())
+            .then(blob => {
+                data.append('file', blob, filename);
+                data.append('queue', $('#printerDropdown').val());
+                data.append('username', "basherman@vasion.com");  // Fetch from your UI or remove if not necessary
+                data.append('copies', copies);
+                data.append('duplex', duplex);
+                data.append('color', color);
 
-                    return $.ajax({
-                        url: '/send-print-job',
-                        type: 'POST',
-                        data: data,
-                        processData: false,
-                        contentType: false
-                    });
-                })
-                .then(response => {
-                    alert(response.status === "success" ? "Job sent successfully!" : "Error: " + response.message);
+                return $.ajax({
+                    url: '/send-print-job',
+                    type: 'POST',
+                    data: data,
+                    processData: false,
+                    contentType: false
                 });
-}
-
-
-
+            })
+            .then(response => {
+                alert(response.status === "success" ? "Job sent successfully!" : "Error: " + response.message);
+            });
+    }   
+        
         function saveTableData() {
             let data = [];
             $("#applicantsTable tr").each(function() {

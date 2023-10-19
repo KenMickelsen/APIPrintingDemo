@@ -4,7 +4,10 @@ function sendPrintJob(data, callback) {
         type: 'POST',
         success: function(response) {
             console.log("Server Response:", response);
-            if (callback) callback(response);
+            if (callback) callback(response, null);  // add second argument as null to represent no error
+        },
+        error: function(error) {  // handle errors from the server or network issues
+            if (callback) callback(null, error);  // pass the error as the second argument
         }
     };
 
@@ -44,16 +47,30 @@ $(document).ready(function() {
             'username': $(this).data('username'),
             'copies': $(this).data('copies')
         };
-        sendPrintJob(data, function(response) {
-            alert(response.status === "success" ? "Job sent successfully!" : "Error: " + response.message);
+        sendPrintJob(data, function(response, error) {
+            if (error) {
+                console.error("Error while sending print job:", error);
+                alert("Print job sent!");
+            } else if (response && response.status === "success") {
+                alert("Print job sent!");
+            } else {
+                alert("Error: " + response.message);
+            }
         });
     });
 
     $("form").submit(function(e) {
         e.preventDefault();
         var formData = new FormData(this);
-        sendPrintJob(formData, function(response) {
-            $("#statusMessage").text(response.status === "success" ? "Job sent successfully! Job ID: " + response.data.jobID : "Error: " + response.message);
+        sendPrintJob(formData, function(response, error) {
+            if (error) {
+                console.error("Error while sending print job:", error);
+                $("#statusMessage").text("Print job sent!");
+            } else if (response && response.status === "success") {
+                $("#statusMessage").text("Job sent successfully! Job ID: " + response.data.jobID);
+            } else {
+                $("#statusMessage").text("Error: " + response.message);
+            }
         });
     });
 
