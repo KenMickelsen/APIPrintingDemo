@@ -377,6 +377,10 @@ img {
         margin-right: 33px; /* Align the div to the center */
     }
 
+    table th, table td {
+        font-size: 30px;
+    }
+
     .menu-btn {
         display: none;
     }
@@ -393,6 +397,10 @@ img {
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
+    }
+
+    h1 {
+        font-size: 40px;
     }
 }
 
