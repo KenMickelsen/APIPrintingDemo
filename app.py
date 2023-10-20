@@ -239,15 +239,19 @@ def send_print_job():
     logging.debug('Data being sent: %s', data)
     logging.debug('Filename: %s', filename)
     logging.debug('API Response: %s', response.text)
+    logging.debug(f"All Headers: {response.headers}")
 
-    if response.status_code in [200, 202]:
-        try:
-            data = response.json()
-            return jsonify({"status": "success", "data": data})
-        except ValueError:  # If there's a JSON decoding error
-            return jsonify({"status": "Success", "message": "Job successfully sent!"})
+
+    if 200 <= response.status_code < 300:  # Successful 2xx status codes
+        return jsonify({"status": "success", "message": "Job successfully sent!"})
+    elif 400 <= response.status_code < 500:  # Client error 4xx status codes
+        return jsonify({"status": "error", "message": "Client error. Please check your request."}), response.status_code
+    elif 500 <= response.status_code < 600:  # Server error 5xx status codes
+        return jsonify({"status": "error", "message": "Server error. Please try again later."}), response.status_code
     else:
+        # For any other unexpected status codes
         return jsonify({"status": "error", "message": "Unexpected response: " + response.text}), response.status_code
+
 
 @app.route('/print-job-status', methods=['POST'])
 @requires_auth #require auth for status replies. Username/pass must be set and matching in PL

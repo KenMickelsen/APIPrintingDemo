@@ -333,6 +333,12 @@ label[for="defaultFile"] {
     cursor: pointer;
 }
 
+.responseMessage {
+    display: none;  /* Initially hidden */
+    margin-left: 10px;
+    color: red;  /* Assuming you want error messages in red, modify as needed */
+}
+
 /* Styles for tablets and above */
 @media (min-width: 768px) {
     header {

@@ -1,15 +1,17 @@
 function sendPrintJob(data, callback) {
-    var options = {
+    $.ajax({
         url: '/send-print-job',
         type: 'POST',
+        data: data,
         success: function(response) {
             console.log("Server Response:", response);
             if (callback) callback(response, null);  // add second argument as null to represent no error
         },
-        error: function(error) {  // handle errors from the server or network issues
-            if (callback) callback(null, error);  // pass the error as the second argument
+        error: function(xhr, status, error) {  // handle errors from the server or network issues
+            if (callback) callback(null, xhr.responseText);  // pass the error message as the second argument
         }
-    };
+    });
+
 
     // If data is an instance of FormData, adjust the options for the AJAX call
     if (data instanceof FormData) {
@@ -57,15 +59,21 @@ $(document).ready(function() {
                 } else if (response && response.status === "success") {
                     // Show alert only once after all copies are sent
                     if (i === copies - 1) {
-                        alert("Print job(s) sent!");
-                    }
+                        showMessage($(this).siblings(".responseMessage"), "Print job(s) sent!");
+                    }                    
                 } else {
-                    alert("Error: " + response.message);
+                    showMessage($(this).siblings(".responseMessage"), "Error: " + response.message);
                 }
             });
         }
     });
     
+    function showMessage(element, message) {
+        element.text(message).show();
+        setTimeout(function() {
+            element.fadeOut();
+        }, 6000);  // hide after 6 seconds
+    }    
 
     $("form").submit(function(e) {
         e.preventDefault();
