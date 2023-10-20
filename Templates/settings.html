@@ -66,14 +66,21 @@
                     <input type="checkbox" name="duplex" value="true"> Duplex
                     <input type="checkbox" name="color" value="true" checked> Color
                     <!-- ... -->
-                    <button type="submit">Send Print Job</button>
+                    <button type="printButton">Send Print Job</button>
                 </form>  
             
                 <form action="/upload-default-job" method="post" enctype="multipart/form-data">
-                    <label for="defaultFile">Default Check Print Job:</label>
+                    <label for="defaultFile">Default Check Print Job: 
+                        {% if default_uploaded_file %}
+                            <span>{{ default_uploaded_file }}</span>
+                        {% else %}
+                            <span>No file uploaded</span>
+                        {% endif %}
+                    </label>
                     <input type="file" name="file" id="defaultFile" required>
-                    <button type="submit">Upload and Save</button>
+                    <button type="submit" class="btn btn-text">Upload and Save</button>
                 </form> 
+                
             </div>
             <div class="table-header">
                 <h1> Printers</h1>
@@ -228,6 +235,12 @@
             }
         });
         }
+
+        $('#defaultFile').change(function() {
+        if (this.value) {
+            $(this).closest('form').submit();
+        }
+    });
     </script>
 </body>
 </html>

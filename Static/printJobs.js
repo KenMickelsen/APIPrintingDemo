@@ -41,23 +41,31 @@ $(document).ready(function() {
     }
 
     $(".printButton").click(function() {
+        var copies = $(this).siblings(".copiesInput").val(); // Get number of copies from the input field
         var data = {
             'filename': $(this).data('file'),
             'queue': $(this).data('queue'),
             'username': $(this).data('username'),
-            'copies': $(this).data('copies')
+            'copies': 1 // Always sending 1 copy at a time, but we'll loop as per the number of copies
         };
-        sendPrintJob(data, function(response, error) {
-            if (error) {
-                console.error("Error while sending print job:", error);
-                alert("Print job sent!");
-            } else if (response && response.status === "success") {
-                alert("Print job sent!");
-            } else {
-                alert("Error: " + response.message);
-            }
-        });
+    
+        // Send the print job the number of times as specified by the copies input
+        for (let i = 0; i < copies; i++) {
+            sendPrintJob(data, function(response, error) {
+                if (error) {
+                    console.error("Error while sending print job:", error);
+                } else if (response && response.status === "success") {
+                    // Show alert only once after all copies are sent
+                    if (i === copies - 1) {
+                        alert("Print job(s) sent!");
+                    }
+                } else {
+                    alert("Error: " + response.message);
+                }
+            });
+        }
     });
+    
 
     $("form").submit(function(e) {
         e.preventDefault();

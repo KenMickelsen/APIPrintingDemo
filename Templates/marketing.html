@@ -43,7 +43,10 @@
                     <tr>
                         <td>{{ file }}</td>
                         <td><a href="{{ url_for('static', filename=file) }}" target="_blank">View</a></td>
-                        <td><button class="printButton" data-file="{{ file }}" data-queue="Xerox_VBC_OM" data-username="clarkadams@vasion.com" data-copies="1">Print</button></td>
+                        <td>
+                            Copies <input type="number" class="copiesInput" min="1" value="1">
+                            <button class="printButton" data-file="{{ file }}" data-queue="Xerox_VBC_OM" data-username="clarkadams@vasion.com" data-copies="1">Print</button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

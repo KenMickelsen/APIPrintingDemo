@@ -319,6 +319,20 @@ img {
     width: 100%;
     text-align: center;
 }
+
+#defaultFile {
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    z-index: -1; /* Push the element to the background */
+}
+
+label[for="defaultFile"] {
+    padding: 10px;
+    cursor: pointer;
+}
+
 /* Styles for tablets and above */
 @media (min-width: 768px) {
     header {
