@@ -336,7 +336,11 @@ label[for="defaultFile"] {
 .responseMessage {
     display: none;  /* Initially hidden */
     margin-left: 10px;
-    color: red;  /* Assuming you want error messages in red, modify as needed */
+    max-width: 350px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
 }
 
 /* Styles for tablets and above */

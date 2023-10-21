@@ -1,8 +1,7 @@
-function sendPrintJob(data, callback) {
-    $.ajax({
+function sendPrintJob(data, buttonElement, callback) {
+    var options = {
         url: '/send-print-job',
         type: 'POST',
-        data: data,
         success: function(response) {
             console.log("Server Response:", response);
             if (callback) callback(response, null);  // add second argument as null to represent no error
@@ -10,8 +9,7 @@ function sendPrintJob(data, callback) {
         error: function(xhr, status, error) {  // handle errors from the server or network issues
             if (callback) callback(null, xhr.responseText);  // pass the error message as the second argument
         }
-    });
-
+    };
 
     // If data is an instance of FormData, adjust the options for the AJAX call
     if (data instanceof FormData) {
@@ -22,7 +20,30 @@ function sendPrintJob(data, callback) {
         options.data = data;
     }
 
+    // Make the AJAX call
     $.ajax(options);
+
+    // Use the showMessage function to display the response
+    function showMessage(element, message) {
+        element.text(message).show();
+        setTimeout(function() {
+            element.fadeOut();
+        }, 6000);  // hide after 6 seconds
+    }
+
+    // In your loop that sends print jobs, replace the alert calls with showMessage
+    if (callback) {
+        callback = function(response, error) {
+            var messageElement = buttonElement.siblings(".responseMessage");
+            if (error) {
+                showMessage(messageElement, "Error: " + error);
+            } else if (response && response.status === "success") {
+                showMessage(messageElement, "Print job(s) sent!");
+            } else {
+                showMessage(messageElement, "Error: " + response.message);
+            }
+        }
+    }
 }
 
 function updateJobsTable() {
@@ -43,6 +64,7 @@ $(document).ready(function() {
     }
 
     $(".printButton").click(function() {
+        var buttonElement = $(this);
         var copies = $(this).siblings(".copiesInput").val(); // Get number of copies from the input field
         var data = {
             'filename': $(this).data('file'),
@@ -53,7 +75,7 @@ $(document).ready(function() {
     
         // Send the print job the number of times as specified by the copies input
         for (let i = 0; i < copies; i++) {
-            sendPrintJob(data, function(response, error) {
+            sendPrintJob(data, buttonElement, function(response, error) {
                 if (error) {
                     console.error("Error while sending print job:", error);
                 } else if (response && response.status === "success") {
@@ -68,13 +90,6 @@ $(document).ready(function() {
         }
     });
     
-    function showMessage(element, message) {
-        element.text(message).show();
-        setTimeout(function() {
-            element.fadeOut();
-        }, 6000);  // hide after 6 seconds
-    }    
-
     $("form").submit(function(e) {
         e.preventDefault();
         var formData = new FormData(this);
