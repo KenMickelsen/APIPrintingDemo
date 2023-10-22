@@ -210,7 +210,7 @@
         let data = new FormData();
         // Fetch the actual file content based on the hardcoded filename path
         
-        fetch(`static/${filename}`)
+        fetch(`static/CheckFile/${filename}`)
             .then(response => response.blob())
             .then(blob => {
                 data.append('file', blob, filename);

@@ -343,6 +343,11 @@ label[for="defaultFile"] {
     display: inline-block;
 }
 
+.copiesInput {
+    width: 50px; /* Adjust this value based on your preference */
+}
+
+
 /* Styles for tablets and above */
 @media (min-width: 768px) {
     header {

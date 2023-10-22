@@ -54,20 +54,6 @@
                 <h2>Service Client Address</h2>
                 <label for="apiEndpoint">API Endpoint:</label>
                 <input type="url" id="apiEndpoint" placeholder="Enter the API Endpoint">
-                
-                <h2>Manual Job Send</h2>
-                <form action="/send-print-job" method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" required>
-                    <input type="text" name="queue" placeholder="Printer Queue" required>
-                    <input type="text" name="username" placeholder="Username/Email" required>
-                    <input type="text" name="statusURL" placeholder="Status URL">
-                    <!-- Add other inputs for other fields here -->
-                    <input type="number" name="copies" placeholder="Number of Copies" min="1" required>
-                    <input type="checkbox" name="duplex" value="true"> Duplex
-                    <input type="checkbox" name="color" value="true" checked> Color
-                    <!-- ... -->
-                    <button type="printButton">Send Print Job</button>
-                </form>  
             
                 <form action="/upload-default-job" method="post" enctype="multipart/form-data">
                     <label for="defaultFile">Default Check Print Job: 
@@ -104,6 +90,20 @@
             </table>
         </div>
     </div>
+
+    <h2>Manual Job Send</h2>
+                <form action="/send-print-job" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" required>
+                    <input type="text" name="queue" placeholder="Printer Queue" required>
+                    <input type="text" name="username" placeholder="Username/Email" required>
+                    <input type="text" name="statusURL" placeholder="Status URL">
+                    <!-- Add other inputs for other fields here -->
+                    <input type="number" name="copies" placeholder="Number of Copies" min="1" required>
+                    <input type="checkbox" name="duplex" value="true"> Duplex
+                    <input type="checkbox" name="color" value="true" checked> Color
+                    <!-- ... -->
+                    <button type="printButton">Send Print Job</button>
+                </form>  
 
     <script>
         function debounce(func, wait) {
@@ -187,6 +187,7 @@
                         row.remove();
                     }
                 });
+                debouncedSave();
             });
 
             selectAllCheckbox.click(function() {
