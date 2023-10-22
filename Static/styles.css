@@ -236,7 +236,7 @@ tbody tr:hover {
     margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 50%;
+    width: 90%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     color:#000;
 }
@@ -347,6 +347,13 @@ label[for="defaultFile"] {
     width: 50px; /* Adjust this value based on your preference */
 }
 
+#apiEndpoint {
+    width: 300px;
+}
+
+span {
+    color:#000
+}
 
 /* Styles for tablets and above */
 @media (min-width: 768px) {

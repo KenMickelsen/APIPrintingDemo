@@ -154,7 +154,7 @@ def upload_default_job():
     file = request.files.get('file')
     if file:
         # Save the file to a specific location.
-        file.save(os.path.join("static", "check.pdf"))
+        file.save(os.path.join("static/CheckFile", "check.pdf"))
     return redirect(url_for('settings'))  # Redirect back to settings page.
 
 #Send print job

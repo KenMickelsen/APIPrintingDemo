@@ -26,7 +26,7 @@
     <div id="jobsModal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
-            <h2>Print Job Reports</h2>
+            <h2>Most Recent 20 Print Jobs</h2>
             <table id="jobsTable">
                 <thead>
                     <tr>
@@ -54,19 +54,14 @@
                 <h2>Service Client Address</h2>
                 <label for="apiEndpoint">API Endpoint:</label>
                 <input type="url" id="apiEndpoint" placeholder="Enter the API Endpoint">
-            
-                <form action="/upload-default-job" method="post" enctype="multipart/form-data">
-                    <label for="defaultFile">Default Check Print Job: 
-                        {% if default_uploaded_file %}
-                            <span>{{ default_uploaded_file }}</span>
-                        {% else %}
-                            <span>No file uploaded</span>
-                        {% endif %}
-                    </label>
-                    <input type="file" name="file" id="defaultFile" required>
-                    <button type="submit" class="btn btn-text">Upload and Save</button>
-                </form> 
+                <span id="apiSaveStatus"></span>
                 
+                <h2>Upload Default Check PDF</h2>
+                <label>Choose a PDF file:</label>
+                <input type="file" id="defaultCheckUpload" accept=".pdf" style="display:none;">
+                <button id="triggerFileUpload">Upload Check PDF</button>
+                <span id="uploadStatus"></span>
+
             </div>
             <div class="table-header">
                 <h1> Printers</h1>
@@ -120,13 +115,16 @@
         $(document).ready(function() {
 
             // Fetch and display data
+            let apiEndpoint = $("#apiEndpoint").val();
+            
             $.get('/get-settings', function(data) {
                 data.printers.forEach(function(printer) {
                     addRow(printer);
                 });
-                // Populate the API endpoint field if it exists in the response
+                // Populate the API endpoint field if it exists in the response and set the initialApiEndpointValue 
                 if (data.apiEndpoint) {
                     $('#apiEndpoint').val(data.apiEndpoint);
+                    initialApiEndpointValue = data.apiEndpoint;
                 }
             });
 
@@ -147,9 +145,15 @@
             let selectAllCheckbox = $("#selectAll");
 
 
-            // Detect when user is typing into any input field
-            printersTable.on('input', 'input[name="printer_name"], #apiEndpoint', function() {
+            // Detect when user is typing into printer names field
+            printersTable.on('input', 'input[name="printer_name"]', function() {
                 debouncedSave();
+            });
+
+            //Detect when user is typing into API Endpoint field    
+            $('#apiEndpoint').on('input', function() {
+                debouncedSave();
+
             });
 
             reportsButton.click(function() {
@@ -194,54 +198,96 @@
                 let isChecked = $(this).is(":checked");
                 printersTable.find("input[type='checkbox']").prop("checked", isChecked);
             });
+
+            // File upload functionality
+            $("#triggerFileUpload").click(function() {
+                $("#defaultCheckUpload").trigger('click'); 
+            });
+            
+            $("#defaultCheckUpload").change(function() {
+                if (this.files.length > 0) {
+                    let file = this.files[0];
+
+                    let formData = new FormData();
+                    formData.append("file", file);
+
+                    $.ajax({
+                        url: '/upload-default-job',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            $("#uploadStatus").text("File uploaded successfully!");
+
+                            setTimeout(function() {
+                                $("#uploadStatus").text("");
+                            }, 6000);  // 6 seconds
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $("#uploadStatus").text("Failed to upload file. Please try again.");
+
+                            setTimeout(function() {
+                                $("#uploadStatus").text("");
+                            }, 6000);  // 6 seconds
+                        }
+                    });
+                }
+            });
         });
 
         function savePrinterTableData() {
-        // Gather all printer names into an array
-        let printerNames = [];
         
-        // Iterate through each printer name input field and get its value
-        $('#printersTable tbody input[name="printer_name"]').each(function() {
-            let printerName = $(this).val();
-            if (printerName) { // Ensure the printer name is not an empty string
-                printerNames.push(printerName);
-            }
-        });
-
-        // Get the API endpoint from the input
-        let apiEndpoint = $("#apiEndpoint").val();
-
-        // Create a data object to match expected structure on the server
-        let dataToSend = {
-            printers: printerNames,
-            apiEndpoint: apiEndpoint
-        };
-
-        // Use jQuery's ajax method to send data
-        $.ajax({
-            url: '/save-settings',
-            type: 'POST',
-            data: JSON.stringify(dataToSend),
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === "success") {
-                    console.log("Data saved successfully!");
-                } else {
-                    console.log("Failed to save data!");
+                // Gather all printer names into an array
+            let printerNames = [];
+            
+            // Iterate through each printer name input field and get its value
+            $('#printersTable tbody input[name="printer_name"]').each(function() {
+                let printerName = $(this).val();
+                if (printerName) { // Ensure the printer name is not an empty string
+                    printerNames.push(printerName);
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Error:", errorThrown);
-            }
-        });
-        }
+            });
 
-        $('#defaultFile').change(function() {
-        if (this.value) {
-            $(this).closest('form').submit();
+            // Get the API endpoint from the input
+            let apiEndpoint = $("#apiEndpoint").val();
+
+            // Create a data object to match expected structure on the server
+            let dataToSend = {
+                printers: printerNames,
+                apiEndpoint: apiEndpoint
+            };
+
+            // Use jQuery's ajax method to send data
+            $.ajax({
+                url: '/save-settings',
+                type: 'POST',
+                data: JSON.stringify(dataToSend),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(response) {
+                    console.log("Success callback executed!");
+                    console.log("Server Response:", response);
+
+                    if (response.status === "success") {
+                        // Display "Saved!" and clear after 3 seconds
+                        if (apiEndpoint !== initialApiEndpointValue) {
+                            $("#apiSaveStatus").text("Saved!");
+                            setTimeout(function() {
+                                $("#apiSaveStatus").text("");
+                            }, 3000); // 3 seconds
+                        }
+                        
+
+                    } else {
+                        console.log("Failed to save data!");
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error:", errorThrown);
+                }
+            });
         }
-    });
     </script>
 </body>
 </html>
