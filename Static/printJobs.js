@@ -25,10 +25,11 @@ function sendPrintJob(data, buttonElement, callback) {
 
     // Use the showMessage function to display the response
     function showMessage(element, message) {
-        element.text(message).show();
-       // setTimeout(function() {
-       //     element.fadeOut();
-       // }, 6000);  // hide after 6 seconds
+        //element.text(message).show();
+        element.html(message);
+        setTimeout(function() {
+            element.fadeOut();
+        }, 4000);  // hide after 6 seconds
     }
 
     // In your loop that sends print jobs, replace the alert calls with showMessage
@@ -38,9 +39,9 @@ function sendPrintJob(data, buttonElement, callback) {
             if (error) {
                 showMessage(messageElement, "Error: " + error);
             } else if (response && response.status === "success") {
-                showMessage(messageElement, "Print job(s) sent!");
+                showMessage(messageElement, `<div class="success-alert"><i class="fa fa-check-circle-o"></i> Print job(s) sent! </div>`);
             } else {
-                showMessage(messageElement, "Error: " + response.message);
+                showMessage(messageElement, "Error");
             }
         }
     }
@@ -81,7 +82,8 @@ $(document).ready(function() {
                 } else if (response && response.status === "success") {
                     // Show alert only once after all copies are sent
                     if (i === copies - 1) {
-                        showMessage($(this).siblings(".responseMessage"), "Print job(s) sent!");
+                        const icon='<i class="fa fa-check-circle-o"></i>'
+                        showMessage($(this).siblings(".responseMessage"), `${icon} Print job(s) sent!`);
                     }                    
                 } else {
                     showMessage($(this).siblings(".responseMessage"), "Error: " + response.message);
