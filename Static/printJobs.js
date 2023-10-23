@@ -37,11 +37,11 @@ function sendPrintJob(data, buttonElement, callback) {
         callback = function(response, error) {
             var messageElement = buttonElement.siblings(".responseMessage");
             if (error) {
-                showMessage(messageElement, "Error: " + error);
+                showMessage(messageElement, `<div class="error-alert"><i class="fa-regular fa-triangle-exclamation"></i> Error </div>`);
             } else if (response && response.status === "success") {
                 showMessage(messageElement, `<div class="success-alert"><i class="fa fa-check-circle-o"></i> Print job(s) sent! </div>`);
             } else {
-                showMessage(messageElement, "Error");
+                showMessage(messageElement, `<div class="error-alert"><i class="fa-regular fa-triangle-exclamation"></i> Error </div>`);
             }
         }
     }

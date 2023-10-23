@@ -1,1 +1,1 @@
-{"printers": ["HP_VBC_OM", "Lexmark_VBC_OM", "Xerox_VBC_OM"], "apiEndpoint": "https://192.168.1.166:31990/v1/print"}
+{"printers": ["HP_VBC_OM", "Lexmark_VBC_OM", "Xerox_VBC_OM"], "apiEndpoint": "https://vasionebc-sc:31990/v1/print"}
