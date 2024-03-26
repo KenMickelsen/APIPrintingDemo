@@ -26,10 +26,10 @@ function sendPrintJob(data, buttonElement, callback) {
     // Use the showMessage function to display the response
     function showMessage(element, message) {
         //element.text(message).show();
-        element.html(message);
+        element.html(message).show();
         setTimeout(function() {
             element.fadeOut();
-        }, 4000);  // hide after 6 seconds
+        }, 4000);  // hide after 4 seconds
     }
 
     // In your loop that sends print jobs, replace the alert calls with showMessage
