@@ -121,6 +121,21 @@ def save_printers():
         json.dump(data, file)
     return jsonify({"status": "success"})
 
+@app.route('/get-default-printer', methods=['GET'])
+def get_default_printer():
+    try:
+        with open('static/settings.json', 'r') as file:
+            settings = json.load(file)
+            default_printer = settings.get('defaultPrinter', None)
+            if default_printer:
+                return jsonify({'defaultPrinter': default_printer})
+            else:
+                return jsonify({'error': 'Default printer not set'}), 404
+    except FileNotFoundError:
+        return jsonify({'error': 'Settings file not found'}), 404
+    except json.JSONDecodeError:
+        return jsonify({'error': 'Error decoding settings'}), 500
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')

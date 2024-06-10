@@ -77,6 +77,7 @@
                     <tr>
                         <th><input type="checkbox" id="selectAll"></th>
                         <th>Printer Name</th>
+                        <th>Default Printer</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -118,24 +119,27 @@
             let apiEndpoint = $("#apiEndpoint").val();
             
             $.get('/get-settings', function(data) {
+                let defaultPrinter = data.defaultPrinter;
                 data.printers.forEach(function(printer) {
-                    addRow(printer);
+                    addRow(printer, defaultPrinter);
                 });
-                // Populate the API endpoint field if it exists in the response and set the initialApiEndpointValue 
                 if (data.apiEndpoint) {
                     $('#apiEndpoint').val(data.apiEndpoint);
-                    initialApiEndpointValue = data.apiEndpoint;
                 }
             });
 
-            function addRow(printerName) {
-            let newRow = `
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td><input type="text" name="printer_name" value="${printerName}" placeholder="Enter Printer Name"></td>
-                </tr>`;
-            printersTable.append(newRow);
+            function addRow(printerName, defaultPrinter) {
+                let isDefault = (printerName === defaultPrinter);
+                let checkedAttribute = isDefault ? 'checked' : '';
+                let newRow = `
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td><input type="text" name="printer_name" value="${printerName}" placeholder="Enter Printer Name"></td>
+                        <td><input type="radio" name="defaultPrinter" ${checkedAttribute}></td>
+                    </tr>`;
+                $('#printersTable tbody').append(newRow);
             }
+
             let reportsButton = $("#reportsButton");
             let jobsModal = $("#jobsModal");
             let closeJobsModal = jobsModal.find(".close-btn");
@@ -144,6 +148,18 @@
             let deleteRowsButton = $("#deleteRows");
             let selectAllCheckbox = $("#selectAll");
 
+
+            $(document).ready(function() {
+                // Existing code...
+
+                // Ensure only one default printer can be selected
+                $('#printersTable').on('change', 'input[type="radio"][name="defaultPrinter"]', function() {
+                    $('input[type="radio"][name="defaultPrinter"]').not(this).prop('checked', false);
+                    debouncedSave();  // Call save function when a default printer is selected
+                });
+
+                // Existing code...
+            });
 
             // Detect when user is typing into printer names field
             printersTable.on('input', 'input[name="printer_name"]', function() {
@@ -177,6 +193,7 @@
                     <tr>
                         <td><input type="checkbox"></td>
                         <td><input type="text" name="printer_name" placeholder="Enter Printer Name"></td>
+                        <td><input type="radio" name="defaultPrinter"></td>
                     </tr>`;
                 printersTable.append(newRow);
             });
@@ -237,54 +254,38 @@
         });
 
         function savePrinterTableData() {
-        
-                // Gather all printer names into an array
             let printerNames = [];
-            
-            // Iterate through each printer name input field and get its value
-            $('#printersTable tbody input[name="printer_name"]').each(function() {
-                let printerName = $(this).val();
-                if (printerName) { // Ensure the printer name is not an empty string
+            let defaultPrinter = '';
+
+            $('#printersTable tbody tr').each(function() {
+                let printerName = $(this).find('input[name="printer_name"]').val();
+                if (printerName) {
                     printerNames.push(printerName);
+                    if ($(this).find('input[type="radio"][name="defaultPrinter"]').is(':checked')) {
+                        defaultPrinter = printerName;
+                    }
                 }
             });
 
-            // Get the API endpoint from the input
             let apiEndpoint = $("#apiEndpoint").val();
-
-            // Create a data object to match expected structure on the server
             let dataToSend = {
                 printers: printerNames,
-                apiEndpoint: apiEndpoint
+                apiEndpoint: apiEndpoint,
+                defaultPrinter: defaultPrinter
             };
 
-            // Use jQuery's ajax method to send data
             $.ajax({
                 url: '/save-settings',
                 type: 'POST',
                 data: JSON.stringify(dataToSend),
                 contentType: 'application/json',
-                dataType: 'json',
                 success: function(response) {
-                    console.log("Success callback executed!");
-                    console.log("Server Response:", response);
-
-                    if (response.status === "success") {
-                        // Display "Saved!" and clear after 3 seconds
-                        if (apiEndpoint !== initialApiEndpointValue) {
-                            $("#apiSaveStatus").text("Saved!");
-                            setTimeout(function() {
-                                $("#apiSaveStatus").text("");
-                            }, 3000); // 3 seconds
-                        }
-                        
-
-                    } else {
-                        console.log("Failed to save data!");
-                    }
+                    console.log("Settings saved successfully.");
+                    $("#apiSaveStatus").text("Settings saved!").show().fadeOut(3000);
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error("Error:", errorThrown);
+                error: function() {
+                    console.error("Failed to save settings.");
+                    $("#apiSaveStatus").text("Failed to save settings.").show().fadeOut(3000);
                 }
             });
         }

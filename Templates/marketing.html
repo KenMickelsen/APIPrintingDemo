@@ -46,7 +46,7 @@
                         <td><a href="{{ url_for('static', filename=file) }}" target="_blank">View</a></td>
                         <td>
                             Copies <input type="number" class="copiesInput" min="1" value="1">
-                            <button class="printButton" data-file="{{ file }}" data-queue="Xerox_VBC_OM" data-username="clarkadams@vasion.com" data-copies="1">Print</button>
+                            <button class="printButton" data-file="{{ file }}" data-queue="" data-username="clarkadams@vasion.com" data-copies="1">Print</button>
                             <span class="responseMessage"></span>
                         </td>                        
                     </tr>
@@ -57,6 +57,18 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="static/printJobs.js"></script> 
+    <script src="static/printJobs.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch default printer
+            $.get('/get-default-printer', function(data) {
+                if (data.defaultPrinter) {
+                    $('.printButton').data('queue', data.defaultPrinter);
+                }
+            });
+
+            // Existing code...
+        });
+    </script>
 </body>
 </html>
