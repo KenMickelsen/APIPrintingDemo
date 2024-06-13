@@ -189,7 +189,7 @@ def send_print_job():
     finally:
         s.close()
 
-    statusURL = f"http://{local_ip}:5000/print-job-status"
+    statusURL = f"http://{local_ip}:5001/print-job-status"
 
     # If a filename is provided, it's a prestored file, so set the file path accordingly
     if filename:
@@ -298,4 +298,4 @@ def get_jobs():
 
 
 if __name__ == '__main__':
-    app.run(host=get_local_ip(), port=5000, debug=True)
+    app.run(host=get_local_ip(), port=5001, debug=True)
